@@ -13,14 +13,14 @@
 
 # Load packages ----
 # Load packages used in code. These may need to be installed the first time
-pacman::p_load(plyr, lubridate, reshape2, igraph, here, beepr)
+pacman::p_load(plyr, lubridate, reshape2, igraph, here, beepr, tidyverse)
 
 # Adjustable settings ----
 
 ## Set the year that is being analyzed. The point of this is to delete any
 ## old data that might have been on the board by mistake.
 
-Year.Analyzed <- 2020
+    Year.Analyzed <- 2020
 
 # Read reference files ----
 
@@ -28,10 +28,10 @@ Year.Analyzed <- 2020
 ## initiation, fledge/failure). The unit-box column must match the unitbox
 ## name used in the saved file name. Multiple nests by the same birds should
 ## be OK, but unique box numbers should be used (e.g. 1_20 & 1_20_2).
-RFIDRef <- read.delim(here("2_reference_files", "RFIDRef.txt"))
+    RFIDRef <- read.delim(here("2_reference_files", "RFIDRef.txt"))
 
 # Subset to the year being analyzed
-RFIDRef <- subset(RFIDRef, RFIDRef$year == Year.Analyzed)
+    RFIDRef <- subset(RFIDRef, RFIDRef$year == Year.Analyzed)
 
 ## Full RFID reference. This is the full RFID reference library. It should list
 ## every possible RFID code that has been deployed to look for matches. At 
@@ -40,7 +40,7 @@ RFIDRef <- subset(RFIDRef, RFIDRef$year == Year.Analyzed)
 ## include other info and should only have one entry per unique RFID code. The
 ## whole point of this file is to link the RFID code to a band number. This sex
 ## needs to be replaced later on for nestlings that returned as adults.
-RFIDFULL <- read.delim(here("2_reference_files", "FULLRFIDReference.txt"))
+    RFIDFULL <- read.delim(here("2_reference_files", "FULLRFIDReference.txt"))
 
 # Build breeding stage ----
 ## Construct a breeding stage reference file from the RFIDRef file. This just
@@ -395,7 +395,7 @@ for(k in 1:length(DoList)){
     
     ## Join the data object to the RFID reference sheet that has by nest info based on "UnitBox"
     d2 <- join(d2, RFIDRef, "unitbox", type = "left", match = "first")
-    d2 <- d2[, 1:18]
+    d2 <- d2[, 1:19]
     
     ## Make a new column that indicates whether a read is from the focal male/female or a different bird.
     d2$focal <- ifelse(as.character(d2$f_rfid) == as.character(d2$rfid), "Yes",
@@ -403,7 +403,7 @@ for(k in 1:length(DoList)){
     
     ## Check on whether there actually are any records left after removing focal birds. If not,
     ## stop the loop here and proceed to the next file. If so, proceed with the loop. 
-    if(nrow(d2)>0){
+    if(nrow(d2) > 0){
       
       ## Calculate the offset between observation and hatch date (e.g., 2 days before hatch
       ## would yield a result of -2)
@@ -447,7 +447,7 @@ All.Visits.Merged <- subset(All.Visits.Merged, !duplicated(UniqueRecord))
 # Make a column that records time in continuous seconds starting with the first of the year. This is kind of silly, 
 # but is easier to work with for calculating intervals, etc.
 All.Visits.Merged$FullTime <- All.Visits.Merged$yday*24*60*60 + All.Visits.Merged$Seconds
-write.table(All.Visits.Merged, here("5_file_output", "AllVisitsMerged.txt"), sep = "\t")
+write.table(All.Visits.Merged, here("5_file_output", paste(Year.Analyzed, "AllVisitsMerged.txt", sep = "_")), sep = "\t")
 
 
 
